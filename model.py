@@ -117,7 +117,7 @@ def model_load(prefix='sl',test=False,data_dir=None,training=True):
         prefix = 'test'
 
     if not data_dir:
-        data_dir = os.path.join(".","data","cs-train")
+        data_dir = os.path.join("data","cs-train")
     
     models = [f for f in os.listdir(os.path.join(".","models")) if re.search(prefix,f)]
 
@@ -138,7 +138,7 @@ def model_load(prefix='sl',test=False,data_dir=None,training=True):
         
     return(all_data, all_models)
 
-def model_predict(country,year,month,day,all_models=None,test=False):
+def model_predict(country,year,month,day,model,model_data,test=False):
     """
     example function to predict from model
     """
@@ -146,38 +146,27 @@ def model_predict(country,year,month,day,all_models=None,test=False):
     # start timer for runtime
     time_start = time.time()
 
-    # load model if needed
-    if not all_models:
-        all_data,all_models = model_load(test=test, training=False)
-    
-    ## input checks
-    if country not in all_models.keys():
-        raise Exception("ERROR (model_predict) - model for country '{}' could not be found".format(country))
-
+    if not model:
+        raise Exception("ERROR (model_predict) - model missing")
     for d in [year,month,day]:
         if re.search("\D",d):
             raise Exception("ERROR (model_predict) - invalid year, month or day")
-    
-    ## load data
-    model = all_models[country]
-    data = all_data[country]
 
     ## check date
-    target_date = "{}-{}-{}".format(year,str(month).zfill(2),str(day).zfill(2))
-    print(target_date)
+    target_date = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}"
+    print(f"Estimating 30 days revenue based on {target_date}.")
 
-    if target_date not in data['dates']:
-        raise Exception("ERROR (model_predict) - date {} not in range {}-{}".format(target_date,
-                                                                                    data['dates'][0],
-                                                                                    data['dates'][-1]))
-    date_indx = np.where(data['dates'] == target_date)[0][0]
-    query = data['X'].iloc[[date_indx]]
+    if target_date not in model_data['dates']:
+        raise Exception(f"ERROR (model_predict) - date {target_date} not in range "
+                        f"{model_data['dates'][0]}-{model_data['dates'][-1]}")
+    date_index = np.where(model_data['dates'] == target_date)[0][0]
+    query = model_data['X'].iloc[[date_index]]
     
-    ## sainty check
-    if data['dates'].shape[0] != data['X'].shape[0]:
+    # sainty check
+    if model_data['dates'].shape[0] != model_data['X'].shape[0]:
         raise Exception("ERROR (model_predict) - dimensions mismatch")
 
-    ## make prediction and gather data for log entry
+    # make prediction and gather data for log entry
     y_pred = model.predict(query)
     y_proba = None
     if 'predict_proba' in dir(model) and 'probability' in dir(model):
@@ -192,7 +181,7 @@ def model_predict(country,year,month,day,all_models=None,test=False):
     ## update predict log
     update_predict_log(country,y_pred,y_proba,target_date, runtime, MODEL_VERSION, test=test)
     
-    return({'y_pred':y_pred,'y_proba':y_proba})
+    return {'y_pred':y_pred, 'y_proba':y_proba}
 
 if __name__ == "__main__":
 
@@ -202,7 +191,7 @@ if __name__ == "__main__":
 
     ## train the model
     print("TRAINING MODELS")
-    data_dir = os.path.join(".","data","cs-train")
+    data_dir = os.path.join("data","cs-train")
     model_train(data_dir,test=True)
 
     ## load the model
@@ -215,5 +204,12 @@ if __name__ == "__main__":
     year='2018'
     month='01'
     day='05'
-    result = model_predict(country,year,month,day, test=True)
-    print(result)
+
+    ## load data
+    if country in all_models.keys():
+        model = all_models[country]
+        data = all_data[country]
+        result = model_predict(country,year,month,day,model=model,model_data=data, test=True)
+        print(result)
+    else:
+        raise Exception(f"ERROR (model_predict) - model for country '{country}' could not be found")
