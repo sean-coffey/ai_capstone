@@ -206,7 +206,7 @@ def engineer_features(df, training=True):
 
 if __name__ == "__main__":
 
-    DATA_DIR = os.path.join(".", "data", "cs-train")
+    DATA_DIR = os.path.join("data", "cs-train")
     print("...fetching data")
     ts_all = get_ts(DATA_DIR,clean=False)
 
