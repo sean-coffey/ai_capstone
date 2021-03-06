@@ -75,7 +75,6 @@ class ApiTest(unittest.TestCase):
         r = requests.post(f'http://127.0.0.1:{port}/predict', json=request_json)
         print(f"Result from test_03_predict: {r.text}")
         response = json.loads(r.text)
-        response['y_pred']
         self.assertTrue(response['y_pred'][0] > 0)
 
 

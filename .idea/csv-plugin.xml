@@ -38,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/scripts to query API.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/solution-guidance/cslib.py">
           <value>
             <Attribute>
