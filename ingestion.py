@@ -96,7 +96,7 @@ def convert_to_ts(df_orig, country=None):
     return (df_time)
 
 
-def get_ts(data_dir, clean=False):
+def get_ts(data_dir,tag=None, clean=False):
     """
     convenience function to read in new data
     uses csv to load quickly
@@ -113,8 +113,11 @@ def get_ts(data_dir, clean=False):
     # if files have already been processed load them
     if len(os.listdir(ts_data_dir)) > 0:
         print("... loading ts data from files")
-        return {re.sub("\.csv", "", cf)[3:]: pd.read_csv(os.path.join(ts_data_dir, cf)) for cf in
-                os.listdir(ts_data_dir)}
+        if tag:
+            ts_csv = [f for f in os.listdir(ts_data_dir) if re.search(tag, f)]
+        else:
+            ts_csv = [f for f in os.listdir(ts_data_dir)]
+        return {re.sub("\.csv", "", cf)[3:]: pd.read_csv(os.path.join(ts_data_dir, cf)) for cf in ts_csv}
 
     ## get original data
     print("... processing data for loading")
@@ -208,7 +211,7 @@ if __name__ == "__main__":
 
     DATA_DIR = os.path.join("data", "cs-train")
     print("...fetching data")
-    ts_all = get_ts(DATA_DIR,clean=False)
+    ts_all = get_ts(DATA_DIR,clean=True)
 
     for key,item in ts_all.items():
         print(key,item.shape)

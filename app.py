@@ -71,7 +71,7 @@ def predict():
     country = query['country']
 
     ## load model
-    all_data, all_models = model_load(test=test, training=False)
+    all_data, all_models = model_load(test=test, tag=country, training=False)
 
     if len(all_models) == 0:
         print("ERROR: model is not available")
@@ -86,7 +86,6 @@ def predict():
                             model_data=all_data[country],
                             test=test)
     result = {}
-    print("(A)", _result)
 
     ## convert numpy objects to ensure they are serializable
     for key, item in _result.items():
@@ -94,7 +93,7 @@ def predict():
             result[key] = item.tolist()
         else:
             result[key] = item
-    print("(B)", result)
+
     return (jsonify(result))
 
 
