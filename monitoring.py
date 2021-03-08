@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 example performance monitoring script
+
+Plan to adapt for revenue forecasting model.
 """
 
 import os, sys, pickle

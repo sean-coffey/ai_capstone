@@ -1,6 +1,10 @@
 # IBM AI Enterprise Workflow Capstone
 Notes for the IBM AI Enterprise Workflow Capstone project. 
 
+A summary by required deliverable is included in the notebook:
+
+		Capstone Deliverables.ipynb
+
 ## Part 1
 
 Overall this part of the case study is meant to tell the story of the data by investigating the relationship between the data and the business opportunity.
